@@ -57,15 +57,14 @@ export default function InsightsPage() {
 
           <div className="space-y-4">
             {recommendations.map((rec) => (
-              <div 
-                key={rec.id} 
-                className={`premium-card border-l-4 flex flex-col gap-4 ${
-                  rec.type === "critical"
+              <div
+                key={rec.id}
+                className={`premium-card border-l-4 flex flex-col gap-4 ${rec.type === "critical"
                     ? "border-l-amber-500/80 bg-gradient-to-r from-[#14100e] to-card"
                     : rec.type === "opportunity"
-                    ? "border-l-primary/80 bg-gradient-to-r from-[#11120f] to-card"
-                    : "border-l-[#54607a]/80 bg-gradient-to-r from-[#0d0f14] to-card"
-                }`}
+                      ? "border-l-primary/80 bg-gradient-to-r from-[#11120f] to-card"
+                      : "border-l-[#54607a]/80 bg-gradient-to-r from-[#0d0f14] to-card"
+                  }`}
               >
                 <div className="flex justify-between items-start gap-4">
                   <div className="space-y-1">
@@ -83,17 +82,16 @@ export default function InsightsPage() {
                       {rec.description}
                     </p>
                   </div>
-                  <span className={`text-[10px] font-semibold font-mono uppercase tracking-wider px-2 py-0.5 rounded border whitespace-nowrap ${
-                    rec.type === "critical"
+                  <span className={`text-[10px] font-semibold font-mono uppercase tracking-wider px-2 py-0.5 rounded border whitespace-nowrap ${rec.type === "critical"
                       ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
                       : "bg-primary/10 text-primary border-primary/20"
-                  }`}>
+                    }`}>
                     {rec.metric}
                   </span>
                 </div>
 
                 <div className="flex justify-end pt-2 border-t border-border/40">
-                  <Link 
+                  <Link
                     href={`/chat?prompt=${encodeURIComponent(getOptimizationPrompt(rec.id))}`}
                     className="text-xs text-primary hover:text-primary-hover font-semibold flex items-center gap-1 transition-colors"
                   >

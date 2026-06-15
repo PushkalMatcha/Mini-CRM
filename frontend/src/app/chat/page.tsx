@@ -43,7 +43,7 @@ function ChatPageContent() {
   useEffect(() => {
     async function fetchLatestCampaignStats() {
       try {
-        const response = await fetch(`${BACKEND_URL}/api/campaigns`);
+        const response = await fetch(`${BACKEND_URL}/api/campaigns/`);
         if (!response.ok) return;
         const campaigns = await response.json();
         

@@ -193,7 +193,7 @@ export default function ChatComposer({
     
     try {
       // 1. Create and Save the Dynamic Segment
-      const segmentRes = await fetch(`${BACKEND_URL}/api/segments`, {
+      const segmentRes = await fetch(`${BACKEND_URL}/api/segments/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -210,7 +210,7 @@ export default function ChatComposer({
 
       // 2. Create and Save the Campaign Draft
       const campaignName = `Campaign - ${segment.name}`;
-      const campaignRes = await fetch(`${BACKEND_URL}/api/campaigns`, {
+      const campaignRes = await fetch(`${BACKEND_URL}/api/campaigns/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
