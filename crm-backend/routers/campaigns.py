@@ -13,14 +13,19 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/campaigns", tags=["Campaigns"])
 
-# Channel stub base URL configuration
 CHANNEL_STUB_URL = os.environ.get("CHANNEL_STUB_URL", "http://localhost:8001")
 
-async def send_to_channel_stub(comm_id: str, campaign_id: str, customer_id: str, channel: str, body: str):
+DEBUG_ERRORS = []
+
+def send_to_channel_stub(comm_id: str, campaign_id: str, customer_id: str, channel: str, body: str):
     """
     Helper function to dispatch a message to the channel-stub simulation engine.
     """
-    async with httpx.AsyncClient() as client:
+    target_url = CHANNEL_STUB_URL.rstrip('/')
+    if ".hf.space" in target_url and target_url.startswith("http://"):
+        target_url = target_url.replace("http://", "https://", 1)
+
+    with httpx.Client(follow_redirects=True) as client:
         try:
             payload = {
                 "communication_id": comm_id,
@@ -29,13 +34,20 @@ async def send_to_channel_stub(comm_id: str, campaign_id: str, customer_id: str,
                 "channel": channel,
                 "message": body
             }
-            response = await client.post(f"{CHANNEL_STUB_URL}/send", json=payload, timeout=5.0)
+            response = client.post(f"{target_url}/send", json=payload, timeout=5.0)
+            if response.status_code != 200:
+                DEBUG_ERRORS.append(f"Non-200 response from channel stub: {response.status_code} - {response.text}")
             return response.status_code == 200
         except Exception as e:
-            logger.error(f"Failed to reach channel stub at {CHANNEL_STUB_URL}: {e}")
+            import traceback
+            err_msg = f"Failed to reach channel stub at {target_url}: {e}\n{traceback.format_exc()}"
+            logger.error(err_msg)
+            DEBUG_ERRORS.append(err_msg)
+            if len(DEBUG_ERRORS) > 20:
+                DEBUG_ERRORS.pop(0)
             return False
 
-async def run_campaign_worker(campaign_id: str):
+def run_campaign_worker(campaign_id: str):
     """
     Background worker that runs campaign execution asynchronously.
     """
@@ -175,7 +187,7 @@ async def run_campaign_worker(campaign_id: str):
             comm_id = comm_resp.data[0]["id"]
             
             # Send to Channel Stub Gateway
-            success = await send_to_channel_stub(comm_id, campaign_id, customer["id"], channel, custom_body)
+            success = send_to_channel_stub(comm_id, campaign_id, customer["id"], channel, custom_body)
             
             if success:
                 # Update communication to sent status
@@ -302,3 +314,16 @@ async def get_campaign_stats(campaign_id: UUID):
             "updated_at": datetime.now(timezone.utc)
         }
     return response.data[0]
+
+@router.get("/debug-env")
+async def debug_env():
+    import sys
+    return {
+        "CHANNEL_STUB_URL": os.environ.get("CHANNEL_STUB_URL"),
+        "CRM_RECEIPT_URL": os.environ.get("CRM_RECEIPT_URL"),
+        "PORT": os.environ.get("PORT"),
+        "STRICT_AUTH": os.environ.get("STRICT_AUTH"),
+        "platform": sys.platform,
+        "os_name": os.name,
+        "errors": DEBUG_ERRORS
+    }
