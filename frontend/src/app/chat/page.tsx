@@ -105,7 +105,7 @@ function ChatPageContent() {
             Maeven AI Chat Composer
           </h1>
           <p className="text-sm text-muted">
-            Converse with Grok to compile segments, draft layouts, and execute campaigns.
+            Converse with Maeven AI to compile segments, draft layouts, and execute campaigns.
           </p>
         </div>
 

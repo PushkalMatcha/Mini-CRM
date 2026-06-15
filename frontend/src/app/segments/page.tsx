@@ -215,7 +215,7 @@ export default function SegmentsPage() {
           Audience Segment Builder
         </h1>
         <p className="text-sm text-muted">
-          Group customers dynamically using manual filter rules or Grok natural language query compiling.
+          Group customers dynamically using manual filter rules or Maeven AI natural language query compiling.
         </p>
       </div>
 
@@ -232,13 +232,13 @@ export default function SegmentsPage() {
             </div>
             
             <p className="text-xs text-muted leading-normal">
-              Type what segment you want to build in plain English (e.g., "Active customers in Mumbai who spent over 500"). Our Grok compiler will automatically generate the schema filters for you.
+              Type what segment you want to build in plain English (e.g., "Active customers in Mumbai who spent over 500"). Our Maeven AI compiler will automatically generate the schema filters for you.
             </p>
 
             <div className="flex gap-3">
               <input
                 type="text"
-                placeholder="Ask Grok to build a segment..."
+                placeholder="Ask Maeven AI to build a segment..."
                 className="premium-input"
                 value={nlQuery}
                 onChange={(e) => setNlQuery(e.target.value)}
@@ -265,7 +265,7 @@ export default function SegmentsPage() {
                 <div className="flex justify-between items-center text-xs border-b border-border/60 pb-2">
                   <div className="flex items-center gap-1.5 font-mono text-muted">
                     <Terminal className="w-3.5 h-3.5 text-primary" />
-                    <span>Grok-Beta Compiler Output</span>
+                    <span>Maeven AI Compiler Output</span>
                   </div>
                   <span className="text-emerald-500 font-semibold font-mono">Matched: {matchingCount} Customers</span>
                 </div>

@@ -379,7 +379,7 @@ export default function ChatComposer({
           <div className="flex justify-start">
             <div className="bg-[#1A1A1A] border border-border px-4 py-3.5 rounded-xl text-sm text-muted flex items-center gap-3 shadow-md">
               <Bot className="w-5 h-5 text-primary animate-pulse" />
-              <span className="font-semibold text-xs tracking-wider uppercase text-[#DFD9CE]">Grok is composing...</span>
+              <span className="font-semibold text-xs tracking-wider uppercase text-[#DFD9CE]">Maeven AI is composing...</span>
             </div>
           </div>
         )}

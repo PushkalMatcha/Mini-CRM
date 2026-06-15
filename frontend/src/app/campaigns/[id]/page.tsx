@@ -128,7 +128,7 @@ export default function CampaignDetailPage() {
     setGeneratingDebrief(true);
     
     try {
-      // Prompt Grok for debrief if key is active, or generate high-fidelity report locally
+      // Prompt Maeven AI for debrief if key is active, or generate high-fidelity report locally
       const promptMessage = `Draft a post-campaign marketing executive debrief for the campaign "${campaign.name}" with these metrics: Sent: ${stats.total_sent}, Delivered: ${stats.delivered}, Failed: ${stats.failed}, Opened: ${stats.opened}, Read: ${stats.read_count}, Clicked: ${stats.clicked}. Delivery Rate: ${stats.delivery_rate}%, Open Rate: ${stats.open_rate}%, Click Rate: ${stats.click_rate}%. Focus on the jewelry retail context and explain copywriting success or segment responsiveness.`;
 
       const response = await fetch(`${BACKEND_URL}/api/ai/chat`, {
