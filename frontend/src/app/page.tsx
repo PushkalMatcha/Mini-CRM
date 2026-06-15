@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import CampaignFunnel from "@/components/CampaignFunnel";
 import { 
   Users, 
   IndianRupee, 
@@ -31,12 +32,7 @@ export default function DashboardPage() {
     { name: "Avg. Segment Churn Risk", value: "32.1%", icon: Percent, change: "-2.3% MoM", changeType: "negative" },
   ];
 
-  const recentOrders = [
-    { id: "1", customer: "Aria Sharma", value: "₹499.00", date: "Just now", status: "Completed", channel: "website" },
-    { id: "2", customer: "Karan Johar", value: "₹120.50", date: "5 mins ago", status: "Completed", channel: "instagram" },
-    { id: "3", customer: "Deepika Padukone", value: "₹840.00", date: "12 mins ago", status: "Processing", channel: "whatsapp" },
-    { id: "4", customer: "Ranveer Singh", value: "₹1,250.00", date: "1 hour ago", status: "Completed", channel: "retail_store" },
-  ];
+
 
   const handleExportReport = () => {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
@@ -121,47 +117,9 @@ export default function DashboardPage() {
 
       {/* Lower Sections */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recent Orders Panel */}
-        <div className="premium-card lg:col-span-2 flex flex-col gap-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-serif font-semibold text-primary">
-              Live Orders Feed
-            </h2>
-            <span className="text-xs text-muted">Real-time syncing</span>
-          </div>
-          
-          <div className="overflow-x-auto w-full">
-            <table className="w-full text-left text-sm border-collapse">
-              <thead>
-                <tr className="border-b border-border text-muted font-medium">
-                  <th className="pb-3">Customer</th>
-                  <th className="pb-3">Source Channel</th>
-                  <th className="pb-3">Order Value</th>
-                  <th className="pb-3">Purchased</th>
-                  <th className="pb-3 text-right">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/40">
-                {recentOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-[#121215]/30 transition-colors">
-                    <td className="py-3.5 font-medium">{order.customer}</td>
-                    <td className="py-3.5 capitalize text-muted">{order.channel.replace("_", " ")}</td>
-                    <td className="py-3.5 font-mono text-primary font-medium">{order.value}</td>
-                    <td className="py-3.5 text-muted text-xs">{order.date}</td>
-                    <td className="py-3.5 text-right">
-                      <span className={`px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full ${
-                        order.status === "Completed" 
-                          ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" 
-                          : "bg-primary/10 text-primary border border-primary/20"
-                      }`}>
-                        {order.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        {/* Campaign Performance Funnel Panel */}
+        <div className="premium-card lg:col-span-2">
+          <CampaignFunnel />
         </div>
 
         {/* AI Insight Card */}
