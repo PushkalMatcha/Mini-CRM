@@ -17,7 +17,7 @@ async def list_tickets(status: Optional[str] = None, priority: Optional[str] = N
     Include the associated customer's name and email via SQL JOIN.
     """
     try:
-        query = supabase.table("tickets").select("*, customers(name, email)")
+        query = supabase.table("tickets").select("*, customers(name, email, phone)")
         if status:
             query = query.eq("status", status)
         if priority:
@@ -33,9 +33,11 @@ async def list_tickets(status: Optional[str] = None, priority: Optional[str] = N
             if isinstance(cust, dict):
                 record["customer_name"] = cust.get("name")
                 record["customer_email"] = cust.get("email")
+                record["customer_phone"] = cust.get("phone")
             else:
                 record["customer_name"] = None
                 record["customer_email"] = None
+                record["customer_phone"] = None
             if "customers" in record:
                 del record["customers"]
             results.append(record)
@@ -53,7 +55,7 @@ async def get_ticket(ticket_id: UUID):
     Retrieve details of a specific ticket by ID.
     """
     try:
-        response = supabase.table("tickets").select("*, customers(name, email)").eq("id", str(ticket_id)).execute()
+        response = supabase.table("tickets").select("*, customers(name, email, phone)").eq("id", str(ticket_id)).execute()
         if not response.data:
             raise HTTPException(
                 status_code=fastapi_status.HTTP_404_NOT_FOUND,
@@ -64,9 +66,11 @@ async def get_ticket(ticket_id: UUID):
         if isinstance(cust, dict):
             record["customer_name"] = cust.get("name")
             record["customer_email"] = cust.get("email")
+            record["customer_phone"] = cust.get("phone")
         else:
             record["customer_name"] = None
             record["customer_email"] = None
+            record["customer_phone"] = None
         if "customers" in record:
             del record["customers"]
         return record
@@ -95,13 +99,15 @@ async def create_ticket(payload: TicketCreate):
         created_ticket = dict(response.data[0])
         
         # Populate customer details
-        cust_resp = supabase.table("customers").select("name, email").eq("id", str(payload.customer_id)).execute()
+        cust_resp = supabase.table("customers").select("name, email, phone").eq("id", str(payload.customer_id)).execute()
         if cust_resp.data:
             created_ticket["customer_name"] = cust_resp.data[0]["name"]
             created_ticket["customer_email"] = cust_resp.data[0]["email"]
+            created_ticket["customer_phone"] = cust_resp.data[0]["phone"]
         else:
             created_ticket["customer_name"] = None
             created_ticket["customer_email"] = None
+            created_ticket["customer_phone"] = None
             
         return created_ticket
     except HTTPException as he:
@@ -133,13 +139,15 @@ async def update_ticket(ticket_id: UUID, payload: TicketUpdate):
         updated_ticket = dict(response.data[0])
         
         # Populate customer details
-        cust_resp = supabase.table("customers").select("name, email").eq("id", str(updated_ticket["customer_id"])).execute()
+        cust_resp = supabase.table("customers").select("name, email, phone").eq("id", str(updated_ticket["customer_id"])).execute()
         if cust_resp.data:
             updated_ticket["customer_name"] = cust_resp.data[0]["name"]
             updated_ticket["customer_email"] = cust_resp.data[0]["email"]
+            updated_ticket["customer_phone"] = cust_resp.data[0]["phone"]
         else:
             updated_ticket["customer_name"] = None
             updated_ticket["customer_email"] = None
+            updated_ticket["customer_phone"] = None
             
         return updated_ticket
     except HTTPException as he:

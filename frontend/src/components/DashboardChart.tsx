@@ -45,7 +45,7 @@ export function RevenueTrendChart() {
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#222" vertical={false} />
           <XAxis dataKey="date" stroke="#737373" fontSize={10} tickLine={false} axisLine={false} />
-          <YAxis stroke="#737373" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}`} />
+          <YAxis stroke="#737373" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `₹${v}`} />
           <Tooltip 
             contentStyle={{ backgroundColor: "#1A1A1A", borderColor: "#2A2A2A", borderRadius: "8px", color: "#F5F5F5" }}
             labelStyle={{ color: "#C9A96E", fontWeight: "bold" }}
@@ -64,7 +64,7 @@ export function CollectionShareChart() {
         <BarChart data={categoryData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#222" vertical={false} />
           <XAxis dataKey="name" stroke="#737373" fontSize={10} tickLine={false} axisLine={false} />
-          <YAxis stroke="#737373" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}`} />
+          <YAxis stroke="#737373" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `₹${v}`} />
           <Tooltip 
             contentStyle={{ backgroundColor: "#1A1A1A", borderColor: "#2A2A2A", borderRadius: "8px", color: "#F5F5F5" }}
           />

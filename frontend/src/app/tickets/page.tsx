@@ -11,6 +11,7 @@ import {
   AlertCircle, 
   User, 
   Mail, 
+  Phone,
   Clock, 
   ChevronRight, 
   Trash2, 
@@ -29,6 +30,7 @@ interface Ticket {
   updated_at: string;
   customer_name?: string;
   customer_email?: string;
+  customer_phone?: string;
 }
 
 interface Customer {
@@ -90,11 +92,12 @@ export default function TicketsPage() {
         async (payload) => {
           if (payload.eventType === "INSERT") {
             const newRow = payload.new as Ticket;
-            const custResp = await supabase.from("customers").select("name, email").eq("id", newRow.customer_id).single();
+            const custResp = await supabase.from("customers").select("name, email, phone").eq("id", newRow.customer_id).single();
             const fullNewTicket = { 
               ...newRow, 
               customer_name: custResp.data ? custResp.data.name : "Unknown Customer",
-              customer_email: custResp.data ? custResp.data.email : "unknown@maeven.com"
+              customer_email: custResp.data ? custResp.data.email : "unknown@maeven.com",
+              customer_phone: custResp.data ? custResp.data.phone : ""
             };
             setTickets(prev => [fullNewTicket, ...prev]);
           } else if (payload.eventType === "UPDATE") {
@@ -403,6 +406,12 @@ export default function TicketsPage() {
                     <Mail className="w-3.5 h-3.5 text-primary/70" />
                     <span>{selectedTicket.customer_email || "no-email@maeven.com"}</span>
                   </div>
+                  {selectedTicket.customer_phone && (
+                    <div className="flex items-center gap-1.5 text-xs text-muted mt-1.5">
+                      <Phone className="w-3.5 h-3.5 text-primary/70" />
+                      <span>{selectedTicket.customer_phone}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 

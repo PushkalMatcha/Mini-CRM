@@ -48,6 +48,7 @@ JEWELRY_TAGS = [
 ]
 
 def generate_products():
+    random.seed(42)
     products = []
     # Generate 40 unique products
     for i in range(40):
@@ -100,6 +101,8 @@ GENDERS = ["Female", "Male", "Non-binary", "Prefer not to say"]
 CUSTOMER_TAGS = ["high-intent", "first-time", "gifting-heavy", "festive-shopper", "newsletter-subscriber", "vip", "abandoned-cart"]
 
 def generate_customers(count=500):
+    random.seed(42)
+    fake.seed_instance(42)
     customers = []
     for _ in range(count):
         gender = random.choices(GENDERS, weights=[65, 20, 10, 5])[0]
@@ -146,6 +149,7 @@ OCCASIONS = ["Birthday", "Anniversary", "Festive Season", "Self-Gift", "None"]
 CHANNELS = ["website", "retail_store", "instagram", "whatsapp"]
 
 def simulate_orders(customers, products, order_count=1850):
+    random.seed(42)
     orders = []
     # Ensure every customer gets at least 1 order to make data robust, then distribute remaining randomly
     customer_ids = [c["id"] for c in customers]

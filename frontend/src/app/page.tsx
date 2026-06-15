@@ -4,7 +4,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { 
   Users, 
-  DollarSign, 
+  IndianRupee, 
   TrendingUp, 
   Percent, 
   ShoppingBag,
@@ -27,16 +27,16 @@ const CollectionShareChart = dynamic(
 export default function DashboardPage() {
   const stats = [
     { name: "Total Customers", value: "500", icon: Users, change: "+12.3% MoM", changeType: "positive" },
-    { name: "Total Revenue Generated", value: "$284,540.00", icon: DollarSign, change: "+8.7% MoM", changeType: "positive" },
+    { name: "Total Revenue Generated", value: "₹284,540.00", icon: IndianRupee, change: "+8.7% MoM", changeType: "positive" },
     { name: "Avg. Campaign Open Rate", value: "68.4%", icon: TrendingUp, change: "+4.1% MoM", changeType: "positive" },
     { name: "Avg. Segment Churn Risk", value: "32.1%", icon: Percent, change: "-2.3% MoM", changeType: "negative" },
   ];
 
   const recentOrders = [
-    { id: "1", customer: "Aria Sharma", value: "$499.00", date: "Just now", status: "Completed", channel: "website" },
-    { id: "2", customer: "Karan Johar", value: "$120.50", date: "5 mins ago", status: "Completed", channel: "instagram" },
-    { id: "3", customer: "Deepika Padukone", value: "$840.00", date: "12 mins ago", status: "Processing", channel: "whatsapp" },
-    { id: "4", customer: "Ranveer Singh", value: "$1,250.00", date: "1 hour ago", status: "Completed", channel: "retail_store" },
+    { id: "1", customer: "Aria Sharma", value: "₹499.00", date: "Just now", status: "Completed", channel: "website" },
+    { id: "2", customer: "Karan Johar", value: "₹120.50", date: "5 mins ago", status: "Completed", channel: "instagram" },
+    { id: "3", customer: "Deepika Padukone", value: "₹840.00", date: "12 mins ago", status: "Processing", channel: "whatsapp" },
+    { id: "4", customer: "Ranveer Singh", value: "₹1,250.00", date: "1 hour ago", status: "Completed", channel: "retail_store" },
   ];
 
   const handleExportReport = () => {

@@ -131,9 +131,9 @@ export default function InsightsPage() {
               </span>
               <div className="space-y-2 text-xs">
                 {[
-                  { name: "Minimalist Chic", sales: "$4,200 spent", percentage: 48 },
-                  { name: "Oxidised Heritage", sales: "$3,100 spent", percentage: 32 },
-                  { name: "Floral Bloom", sales: "$1,850 spent", percentage: 20 }
+                  { name: "Minimalist Chic", sales: "₹4,200 spent", percentage: 48 },
+                  { name: "Oxidised Heritage", sales: "₹3,100 spent", percentage: 32 },
+                  { name: "Floral Bloom", sales: "₹1,850 spent", percentage: 20 }
                 ].map((item) => (
                   <div key={item.name} className="space-y-1">
                     <div className="flex justify-between font-medium">

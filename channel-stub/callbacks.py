@@ -15,7 +15,7 @@ async def dispatch_webhook_callback(communication_id: str, campaign_id: str, eve
     Fires a POST request back to the CRM at {CRM_RECEIPT_URL}/api/receipt.
     Implements a basic retry loop (up to 3 attempts with progressive delay) on failure.
     """
-    url = f"{CRM_RECEIPT_URL.rstrip('/')}/api/receipt"
+    url = f"{CRM_RECEIPT_URL.rstrip('/')}/api/receipt/"
     payload = {
         "communication_id": communication_id,
         "campaign_id": campaign_id,
@@ -33,7 +33,7 @@ async def dispatch_webhook_callback(communication_id: str, campaign_id: str, eve
         for attempt in range(1, max_retries + 1):
             try:
                 logger.info(f"Attempt {attempt}/{max_retries}: Webhook dispatch -> ID: {communication_id}, Event: {event}")
-                response = await client.post(url, json=payload, headers=headers, timeout=5.0)
+                response = await client.post(url, json=payload, headers=headers, timeout=5.0, follow_redirects=True)
                 
                 if response.status_code == 200:
                     logger.info(f"Successfully delivered webhook event '{event}' for communication {communication_id}")

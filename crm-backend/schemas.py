@@ -325,6 +325,7 @@ class TicketResponse(TicketBase):
     id: UUID
     customer_name: Optional[str] = None
     customer_email: Optional[str] = None
+    customer_phone: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

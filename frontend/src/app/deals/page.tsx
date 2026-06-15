@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { 
   Briefcase, 
   Plus, 
-  DollarSign, 
+  IndianRupee, 
   Clock, 
   User, 
   RefreshCw, 
@@ -297,7 +297,7 @@ export default function DealsPage() {
                     <div className="mt-2 flex items-center gap-1.5 text-foreground/90 font-serif">
                       <span className="text-xs text-muted/60">Value:</span>
                       <span className="text-sm font-semibold text-primary font-mono">
-                        ${totalValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        ₹{totalValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                   </div>
@@ -337,7 +337,7 @@ export default function DealsPage() {
                                   
                                   <div className="flex items-center justify-between text-xs mt-2">
                                     <div className="flex items-center gap-1.5 font-mono text-primary font-semibold">
-                                      <DollarSign className="w-3.5 h-3.5 text-primary" />
+                                      <IndianRupee className="w-3 h-3 text-primary shrink-0" />
                                       <span>{Number(deal.value).toFixed(2)}</span>
                                     </div>
                                     
@@ -419,7 +419,7 @@ export default function DealsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-muted uppercase tracking-wider block">
-                    Deal Value ($) <span className="text-rose-500">*</span>
+                    Deal Value (₹) <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="number"

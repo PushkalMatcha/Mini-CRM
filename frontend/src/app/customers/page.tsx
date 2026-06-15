@@ -8,7 +8,6 @@ import {
   Filter, 
   MapPin, 
   ShoppingBag,
-  DollarSign,
   Upload
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
@@ -330,7 +329,7 @@ export default function CustomersPage() {
                       {customer.total_orders}
                     </td>
                     <td className="py-4 px-6 text-right font-mono text-primary font-bold">
-                      ${customer.total_spent.toFixed(2)}
+                      ₹{customer.total_spent.toFixed(2)}
                     </td>
                     <td className="py-4 px-6">
                       <span className="text-[11px] font-medium px-2 py-0.5 bg-[#1C1A16] border border-primary/20 text-primary rounded">
