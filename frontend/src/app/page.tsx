@@ -8,7 +8,6 @@ import {
   TrendingUp, 
   Percent, 
   ShoppingBag,
-  Bell,
   Sparkles,
   BarChart2
 } from "lucide-react";
@@ -57,10 +56,6 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="flex gap-3">
-          <button className="premium-button-secondary">
-            <Bell className="w-4 h-4 text-muted" />
-            <span>Notifications</span>
-          </button>
           <button 
             onClick={handleExportReport}
             className="premium-button-primary"
