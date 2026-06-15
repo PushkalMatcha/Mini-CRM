@@ -15,11 +15,7 @@ async def dispatch_webhook_callback(communication_id: str, campaign_id: str, eve
     Fires a POST request back to the CRM at {CRM_RECEIPT_URL}/api/receipt.
     Implements a basic retry loop (up to 3 attempts with progressive delay) on failure.
     """
-    target_url = CRM_RECEIPT_URL.rstrip('/')
-    if ".hf.space" in target_url and target_url.startswith("http://"):
-        target_url = target_url.replace("http://", "https://", 1)
-        
-    url = f"{target_url}/api/receipt/"
+    url = f"{CRM_RECEIPT_URL.rstrip('/')}/api/receipt/"
     payload = {
         "communication_id": communication_id,
         "campaign_id": campaign_id,
