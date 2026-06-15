@@ -85,6 +85,8 @@ async def run_campaign_worker(campaign_id: str):
                 cust_query = supabase.table("customers").select("*")
                 if isinstance(filter_rules, dict):
                     for field, value in filter_rules.items():
+                        if value is None:
+                            continue
                         if field == "min_spent":
                             cust_query = cust_query.gte("total_spent", float(value))
                         elif field == "max_spent":
@@ -97,8 +99,7 @@ async def run_campaign_worker(campaign_id: str):
                             for tag in value:
                                 cust_query = cust_query.csv("tags", tag)
                         else:
-                            if value is not None:
-                                cust_query = cust_query.eq(field, value)
+                            cust_query = cust_query.eq(field, value)
                 cust_resp = cust_query.execute()
                 customers = cust_resp.data if cust_resp.data else []
         else:
@@ -122,9 +123,40 @@ async def run_campaign_worker(campaign_id: str):
 
         # 3. Dispatch communications
         for customer in customers:
-            # Personalize message template
+            # Resolve customer attributes for personalization
             name = customer.get("name", "there")
-            custom_body = template.replace("{{name}}", name)
+            city = customer.get("city") or "your city"
+            rfm = customer.get("rfm_segment") or "valued customer"
+            
+            # Segment-specific discount codes & personal notes
+            rfm_lower = rfm.lower()
+            if "champion" in rfm_lower:
+                discount = "CHAMP25"
+                note = "special deal only for you because you are our top champion and special to us!"
+            elif "loyal" in rfm_lower:
+                discount = "LOYAL20"
+                note = "special deal only for you because we appreciate your loyalty and you are special to us!"
+            elif "new" in rfm_lower or "recent" in rfm_lower:
+                discount = "WELCOME15"
+                note = "special deal only for you to welcome you to the family because you are special to us!"
+            elif "sleep" in rfm_lower or "attention" in rfm_lower or "at risk" in rfm_lower or "at_risk" in rfm_lower:
+                discount = "MISSYOU25"
+                note = "special deal only for you because we miss your visits and you are special to us!"
+            elif "lost" in rfm_lower or "hibernating" in rfm_lower:
+                discount = "COMEBACK30"
+                note = "special deal only for you because we want to win you back and you are special to us!"
+            else:
+                discount = "SPECIAL10"
+                note = "special deal only for you cause you are special to us!"
+            
+            # Personalize message template with dynamic placeholders
+            custom_body = template
+            custom_body = custom_body.replace("{{name}}", name)
+            custom_body = custom_body.replace("{{city}}", city)
+            custom_body = custom_body.replace("{{rfm_segment}}", rfm)
+            custom_body = custom_body.replace("{{discount_code}}", discount)
+            custom_body = custom_body.replace("{{personal_note}}", note)
+            
             recipient = customer.get("email") if channel == "email" else customer.get("phone", "")
             
             # Create communication log
@@ -197,7 +229,7 @@ async def create_campaign(payload: CampaignCreate):
     """
     Create a new campaign template in draft status.
     """
-    campaign_data = payload.model_dump()
+    campaign_data = payload.model_dump(mode="json")
     campaign_data.update({
         "status": "draft",
         "total_recipients": 0

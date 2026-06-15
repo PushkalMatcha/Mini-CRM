@@ -26,6 +26,8 @@ def evaluate_segment_rules(filter_rules: Dict[str, Any]) -> int:
     
     if isinstance(filter_rules, dict):
         for field, value in filter_rules.items():
+            if value is None:
+                continue
             if field == "min_spent":
                 query = query.gte("total_spent", float(value))
             elif field == "max_spent":
@@ -38,8 +40,7 @@ def evaluate_segment_rules(filter_rules: Dict[str, Any]) -> int:
                 for tag in value:
                     query = query.csv("tags", tag)
             else:
-                if value is not None:
-                    query = query.eq(field, value)
+                query = query.eq(field, value)
                     
     try:
         response = query.execute()
@@ -210,7 +211,7 @@ async def create_segment(payload: SegmentCreate):
     Create a new segment. Evaluates natural language queries if no logical rules are provided,
     previews audience sizes, and saves the segment logic with strict Pydantic validation.
     """
-    segment_data = payload.model_dump()
+    segment_data = payload.model_dump(mode="json")
     filter_json = segment_data.get("filter_json")
     nl_query = segment_data.get("nl_query")
     
@@ -295,6 +296,8 @@ async def get_segment_customers(segment_id: UUID):
     
     if isinstance(filter_rules, dict):
         for field, value in filter_rules.items():
+            if value is None:
+                continue
             if field == "min_spent":
                 query = query.gte("total_spent", float(value))
             elif field == "max_spent":
@@ -307,8 +310,7 @@ async def get_segment_customers(segment_id: UUID):
                 for tag in value:
                     query = query.csv("tags", tag)
             else:
-                if value is not None:
-                    query = query.eq(field, value)
+                query = query.eq(field, value)
                     
     response = query.execute()
     return response.data

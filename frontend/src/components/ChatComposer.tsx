@@ -38,8 +38,15 @@ interface Message {
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
-export default function ChatComposer() {
+export default function ChatComposer({ 
+  prefillPrompt,
+  isDrawer = false
+}: { 
+  prefillPrompt?: string | null;
+  isDrawer?: boolean;
+}) {
   const router = useRouter();
+  const prefillExecutedRef = useRef(false);
   
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -49,6 +56,52 @@ export default function ChatComposer() {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Prefill prompt handler for AI Optimization suggestions
+  useEffect(() => {
+    if (prefillPrompt && !prefillExecutedRef.current) {
+      prefillExecutedRef.current = true;
+      
+      const sendPrefilledPrompt = async () => {
+        setIsLoading(true);
+        // Append user prompt message to list
+        setMessages((prev) => [...prev, { role: "user", content: prefillPrompt }]);
+        
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/ai/chat`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              message: prefillPrompt,
+              chat_history: []
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to process recommendation optimization.");
+          }
+
+          const data = await response.json();
+          setMessages((prev) => [...prev, {
+            role: "assistant",
+            content: data.reply,
+            segment: data.segment,
+            messages: data.messages,
+            channel: data.channel
+          }]);
+        } catch (err) {
+          console.error("Error executing prefilled recommendation:", err);
+          setMessages((prev) => [...prev, {
+            role: "assistant",
+            content: "Sorry, I encountered an error while trying to process the optimization request automatically. Please try typing it manually."
+          }]);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      sendPrefilledPrompt();
+    }
+  }, [prefillPrompt]);
   
   // Track selected template draft variation index for each assistant message in chat history
   const [selectedTemplates, setSelectedTemplates] = useState<Record<number, string>>({});
@@ -201,9 +254,13 @@ export default function ChatComposer() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] border border-border bg-[#121212] rounded-xl overflow-hidden shadow-2xl">
+    <div className={`flex flex-col overflow-hidden ${
+      isDrawer 
+        ? "flex-1 h-full bg-[#121212]" 
+        : "h-[calc(100vh-140px)] border border-border bg-[#121212] rounded-xl shadow-2xl"
+    }`}>
       {/* Messages Feed */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#0B0B0D]">
+      <div className={`flex-1 overflow-y-auto space-y-6 bg-[#0B0B0D] ${isDrawer ? "p-4" : "p-6"}`}>
         {messages.map((msg, index) => {
           const isUser = msg.role === "user";
           return (
@@ -212,11 +269,11 @@ export default function ChatComposer() {
                 
                 {/* Text Bubble */}
                 <div 
-                  className={`px-4.5 py-3.5 rounded-2xl text-xs sm:text-sm leading-relaxed shadow-md ${
+                  className={
                     isUser 
-                      ? "bg-gradient-to-r from-[#C9A96E] to-[#EAD4A9] text-background font-semibold" 
-                      : "bg-[#1A1A1A] border border-border/80 text-foreground"
-                  }`}
+                      ? "px-5 py-3.5 rounded-2xl rounded-br-sm border border-[#C9A96E]/20 bg-gradient-to-br from-[#C9A96E]/15 to-[#C9A96E]/5 backdrop-blur-md text-[#EAE0C8] font-light tracking-wide leading-relaxed text-sm shadow-lg shadow-black/40"
+                      : "px-5 py-3.5 rounded-2xl rounded-tl-sm border border-white/5 bg-[#1A1A1A] text-gray-300 font-light leading-relaxed text-sm shadow-md shadow-black/20"
+                  }
                 >
                   <p className="whitespace-pre-line">{msg.content}</p>
                 </div>
@@ -331,7 +388,7 @@ export default function ChatComposer() {
 
       {/* Input bar */}
       <div className="p-4 border-t border-border bg-[#121212]">
-        <div className="flex gap-3 max-w-4xl mx-auto">
+        <div className="flex gap-3 max-w-4xl mx-auto items-center">
           <input
             type="text"
             disabled={isLoading || firingCampaignIndex !== null}
@@ -339,12 +396,12 @@ export default function ChatComposer() {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-            className="premium-input flex-1"
+            className="rounded-full bg-[#141414] border border-white/10 px-6 py-4 flex-1 text-foreground placeholder:text-muted focus:outline-none focus:border-[#C9A96E]/50 transition-colors text-sm disabled:opacity-50"
           />
           <button 
             onClick={handleSendMessage}
             disabled={isLoading || firingCampaignIndex !== null || !inputValue.trim()}
-            className="premium-button-primary px-6 flex items-center gap-2"
+            className="bg-[#C9A96E] text-black rounded-full px-6 py-4 hover:bg-[#b5955b] transition-all duration-300 shadow-[0_0_15px_rgba(201,169,110,0.2)] flex items-center gap-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
           >
             <Send className="w-4 h-4" />
             <span>Send</span>

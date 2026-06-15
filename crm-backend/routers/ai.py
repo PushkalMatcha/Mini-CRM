@@ -1,11 +1,15 @@
 import os
 import json
 import logging
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from openai import AsyncOpenAI
 from routers.segments import evaluate_segment_rules, local_regex_compile
+from dependencies import RateLimiter
+
+ai_chat_limiter = RateLimiter(requests_limit=5, window_seconds=60)
+ai_template_limiter = RateLimiter(requests_limit=5, window_seconds=60)
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +109,7 @@ Return ONLY valid JSON. Do not include markdown codeblocks (```json or ```), com
 # CHAT ENDPOINT
 # =========================================================================
 
-@router.post("/chat", response_model=AIChatResponse)
+@router.post("/chat", response_model=AIChatResponse, dependencies=[Depends(ai_chat_limiter)])
 async def ai_chat_composer(payload: AIChatRequest):
     """
     Main conversational agent endpoint.
@@ -182,7 +186,7 @@ async def ai_chat_composer(payload: AIChatRequest):
 # TEMPLATE GENERATOR ENDPOINT
 # =========================================================================
 
-@router.post("/generate-templates", response_model=AITemplateResponse)
+@router.post("/generate-templates", response_model=AITemplateResponse, dependencies=[Depends(ai_template_limiter)])
 async def generate_templates(payload: AITemplateRequest):
     """
     Generate message template variations using OpenAI SDK pointing to Grok.

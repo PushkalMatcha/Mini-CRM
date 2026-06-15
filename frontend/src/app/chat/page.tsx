@@ -1,16 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import ChatComposer from "@/components/ChatComposer";
 import { supabase } from "@/lib/supabase";
-import { 
-  Send, 
-  CheckCircle, 
-  Eye, 
-  MousePointerClick, 
-  Sparkles,
-  TrendingUp
-} from "lucide-react";
+import { TrendingUp } from "lucide-react";
 
 interface CampaignStat {
   campaign_id: string;
@@ -27,7 +21,10 @@ interface CampaignStat {
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
-export default function ChatPage() {
+function ChatPageContent() {
+  const searchParams = useSearchParams();
+  const prefillPrompt = searchParams.get("prompt");
+
   const [lastCampaignName, setLastCampaignName] = useState<string>("No active campaigns");
   const [stats, setStats] = useState<CampaignStat>({
     campaign_id: "",
@@ -42,7 +39,7 @@ export default function ChatPage() {
     click_rate: 0.00
   });
 
-  // 1. Fetch latest executed campaign on mount to initialize stats
+  // Fetch latest executed campaign stats
   useEffect(() => {
     async function fetchLatestCampaignStats() {
       try {
@@ -67,9 +64,8 @@ export default function ChatPage() {
     fetchLatestCampaignStats();
   }, []);
 
-  // 2. Set up Supabase Realtime listener to update metrics live
+  // Realtime campaign stats listener
   useEffect(() => {
-    // Listen to changes on table campaign_stats
     const channel = supabase
       .channel("live-chat-stats")
       .on(
@@ -81,7 +77,6 @@ export default function ChatPage() {
           
           if (newStats) {
             setStats(newStats);
-            // Fetch campaign name if it changed
             try {
               const res = await fetch(`${BACKEND_URL}/api/campaigns/${newStats.campaign_id}`);
               if (res.ok) {
@@ -126,7 +121,6 @@ export default function ChatPage() {
             </p>
           </div>
           
-          {/* stats mini grid */}
           <div className="flex gap-4 border-l border-border/60 pl-5">
             <div className="flex flex-col items-center">
               <span className="text-[9px] text-muted font-bold uppercase">Deliv.</span>
@@ -152,8 +146,20 @@ export default function ChatPage() {
 
       {/* Main Chat Composer Area */}
       <div className="flex-1 min-h-0">
-        <ChatComposer />
+        <ChatComposer prefillPrompt={prefillPrompt} />
       </div>
     </div>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-full py-24 text-muted">
+        <span>Loading AI Chat Composer...</span>
+      </div>
+    }>
+      <ChatPageContent />
+    </Suspense>
   );
 }

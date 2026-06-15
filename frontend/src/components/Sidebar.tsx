@@ -9,7 +9,9 @@ import {
   Megaphone, 
   Sparkles, 
   Gem,
-  LogOut
+  LogOut,
+  Briefcase,
+  Inbox
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 

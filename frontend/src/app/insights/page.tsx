@@ -1,4 +1,18 @@
+import Link from "next/link";
 import { Sparkles, TrendingUp, AlertTriangle, ArrowRight } from "lucide-react";
+
+const getOptimizationPrompt = (id: string) => {
+  switch (id) {
+    case "rec-1":
+      return "create a whatsapp campaign segment for 'Oxidised Heritage' jewelry for customers in Bangalore aged 25-35";
+    case "rec-2":
+      return "send a winback email campaign to the 'About to Sleep' segment offering stackable silver ring bundles";
+    case "rec-3":
+      return "create an email campaign for customers tagging purchases as 'Anniversary' to offer custom gift wrapping";
+    default:
+      return "show all active customers";
+  }
+};
 
 export default function InsightsPage() {
   const recommendations = [
@@ -82,10 +96,13 @@ export default function InsightsPage() {
                 </div>
 
                 <div className="flex justify-end pt-2 border-t border-border/40">
-                  <button className="text-xs text-primary hover:text-primary-hover font-semibold flex items-center gap-1 transition-colors">
+                  <Link 
+                    href={`/chat?prompt=${encodeURIComponent(getOptimizationPrompt(rec.id))}`}
+                    className="text-xs text-primary hover:text-primary-hover font-semibold flex items-center gap-1 transition-colors"
+                  >
                     <span>Apply Optimization</span>
                     <ArrowRight className="w-3 h-3" />
-                  </button>
+                  </Link>
                 </div>
               </div>
             ))}

@@ -9,7 +9,9 @@ from uuid import UUID
 from datetime import datetime, timezone
 from models import supabase
 from schemas import CustomerCreate, CustomerUpdate, CustomerResponse
-from dependencies import verify_session
+from dependencies import verify_session, RateLimiter
+
+rfm_limiter = RateLimiter(requests_limit=2, window_seconds=60)
 
 logger = logging.getLogger(__name__)
 
@@ -184,7 +186,7 @@ async def create_customer(payload: CustomerCreate):
     """
     Create a new customer profile.
     """
-    customer_data = payload.model_dump()
+    customer_data = payload.model_dump(mode="json")
     # Add CRM analytic default values
     customer_data.update({
         "total_orders": 0,
@@ -209,7 +211,7 @@ async def update_customer(customer_id: UUID, payload: CustomerUpdate):
     """
     Update details of an existing customer profile.
     """
-    update_data = payload.model_dump(exclude_unset=True)
+    update_data = payload.model_dump(exclude_unset=True, mode="json")
     if not update_data:
         # Fetch current record if no updates provided
         return await get_customer(customer_id)
@@ -235,7 +237,7 @@ async def delete_customer(customer_id: UUID):
         )
     return None
 
-@router.post("/recompute-rfm", dependencies=[Depends(verify_session)], status_code=status.HTTP_200_OK)
+@router.post("/recompute-rfm", dependencies=[Depends(verify_session), Depends(rfm_limiter)], status_code=status.HTTP_200_OK)
 async def recompute_customers_rfm():
     """
     Runs an analytical job across all customers to recompute order counts, values,
@@ -254,7 +256,7 @@ async def recompute_customers_rfm():
         customer_orders[c_id].append(o)
         
     # 2. Fetch all customers
-    customers_resp = supabase.table("customers").select("id").limit(1000).execute()
+    customers_resp = supabase.table("customers").select("id, name, email").limit(1000).execute()
     customers = customers_resp.data if customers_resp.data else []
     
     updated_records = []
@@ -267,6 +269,8 @@ async def recompute_customers_rfm():
             # Set default metrics for customers with no orders
             updated_records.append({
                 "id": c_id,
+                "name": cust["name"],
+                "email": cust["email"],
                 "total_orders": 0,
                 "total_spent": 0.00,
                 "last_purchase_date": None,
@@ -360,6 +364,8 @@ async def recompute_customers_rfm():
             
         updated_records.append({
             "id": c_id,
+            "name": cust["name"],
+            "email": cust["email"],
             "total_orders": total_orders,
             "total_spent": total_spent,
             "last_purchase_date": latest_purchase.isoformat(),

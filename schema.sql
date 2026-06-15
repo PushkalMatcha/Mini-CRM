@@ -235,3 +235,63 @@ BEGIN
     ALTER PUBLICATION supabase_realtime ADD TABLE campaign_stats;
   END IF;
 END $$;
+
+
+-- =========================================================================
+-- 8. DEALS TABLE (KANBAN SALES AUTOMATION)
+-- =========================================================================
+CREATE TABLE IF NOT EXISTS deals (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID REFERENCES customers(id) ON DELETE CASCADE NOT NULL,
+    title TEXT NOT NULL,
+    value NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
+    stage TEXT NOT NULL CHECK (stage IN ('prospect', 'qualified', 'proposal', 'negotiation', 'closed_won', 'closed_lost')),
+    expected_close_date TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_deals_customer ON deals(customer_id);
+CREATE INDEX IF NOT EXISTS idx_deals_stage ON deals(stage);
+
+-- Add deals to Supabase Realtime publication
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'deals'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE deals;
+  END IF;
+END $$;
+
+
+-- =========================================================================
+-- 9. TICKETS TABLE (SHARED SUPPORT INBOX)
+-- =========================================================================
+CREATE TABLE IF NOT EXISTS tickets (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID REFERENCES customers(id) ON DELETE CASCADE NOT NULL,
+    subject TEXT NOT NULL,
+    description TEXT NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('open', 'pending', 'resolved')),
+    priority TEXT NOT NULL CHECK (priority IN ('low', 'medium', 'high', 'urgent')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_tickets_customer ON tickets(customer_id);
+CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets(status);
+CREATE INDEX IF NOT EXISTS idx_tickets_priority ON tickets(priority);
+
+-- Add tickets to Supabase Realtime publication
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'tickets'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE tickets;
+  END IF;
+END $$;
+

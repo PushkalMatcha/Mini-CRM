@@ -74,10 +74,14 @@ export default function SegmentsPage() {
       if (!response.ok) throw new Error("Compilation failed");
       const res = await response.json();
       
-      if (res.preview_data) {
+      if (res.segment) {
+        setCompiledFilters(res.segment.filter_json);
+        setMatchingCount(res.segment.customer_count);
+        // Default a segment name based on query keywords or backend recommendation
+        setSegmentName(segmentName || res.segment.name || `AI Segment - ${nlQuery.slice(0, 20)}...`);
+      } else if (res.preview_data) {
         setCompiledFilters(res.preview_data.filters);
         setMatchingCount(res.preview_data.matching_customers_count);
-        // Default a segment name based on query keywords
         setSegmentName(segmentName || `AI Segment - ${nlQuery.slice(0, 20)}...`);
       } else {
         alert("Could not compile natural language query.");

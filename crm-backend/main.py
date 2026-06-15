@@ -10,6 +10,9 @@ from routers.segments import router as segments_router
 from routers.campaigns import router as campaigns_router
 from routers.receipt import router as receipt_router
 from routers.ai import router as ai_router
+from routers.deals import router as deals_router
+from routers.tickets import router as tickets_router
+from routers.webhooks import router as webhooks_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -30,7 +33,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[FRONTEND_URL], # Removed the wildcard ["*"]
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -49,6 +52,15 @@ app.include_router(receipt_router, prefix="/api")
 
 app.include_router(ai_router)
 app.include_router(ai_router, prefix="/api")
+
+app.include_router(deals_router)
+app.include_router(deals_router, prefix="/api")
+
+app.include_router(tickets_router)
+app.include_router(tickets_router, prefix="/api")
+
+app.include_router(webhooks_router)
+app.include_router(webhooks_router, prefix="/api")
 
 @app.get("/")
 async def get_root_status():

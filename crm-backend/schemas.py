@@ -236,3 +236,98 @@ class AITemplateRequest(BaseModel):
 class AITemplateResponse(BaseModel):
     generated_templates: List[str]
     ai_insight: str
+
+
+# =========================================================================
+# DEAL SCHEMAS (KANBAN SALES AUTOMATION)
+# =========================================================================
+class DealBase(BaseModel):
+    customer_id: UUID
+    title: str
+    value: float = Field(..., ge=0)
+    stage: str = Field(..., description="prospect, qualified, proposal, negotiation, closed_won, closed_lost")
+    expected_close_date: Optional[datetime] = None
+
+class DealCreate(DealBase):
+    pass
+
+class DealUpdate(BaseModel):
+    title: Optional[str] = None
+    value: Optional[float] = Field(None, ge=0)
+    stage: Optional[str] = Field(None, description="prospect, qualified, proposal, negotiation, closed_won, closed_lost")
+    expected_close_date: Optional[datetime] = None
+
+    @field_validator('stage')
+    def validate_stage(cls, v):
+        allowed = ['prospect', 'qualified', 'proposal', 'negotiation', 'closed_won', 'closed_lost']
+        if v and v not in allowed:
+            raise ValueError(f"Invalid Deal Stage. Must be one of {allowed}")
+        return v
+
+class DealResponse(DealBase):
+    id: UUID
+    customer_name: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# =========================================================================
+# TICKET SCHEMAS (SHARED SUPPORT INBOX)
+# =========================================================================
+class TicketBase(BaseModel):
+    customer_id: UUID
+    subject: str
+    description: str
+    status: str = Field(default="open", description="open, pending, resolved")
+    priority: str = Field(default="medium", description="low, medium, high, urgent")
+
+    @field_validator('status')
+    def validate_status(cls, v):
+        allowed = ['open', 'pending', 'resolved']
+        if v and v not in allowed:
+            raise ValueError(f"Invalid status. Must be one of {allowed}")
+        return v
+
+    @field_validator('priority')
+    def validate_priority(cls, v):
+        allowed = ['low', 'medium', 'high', 'urgent']
+        if v and v not in allowed:
+            raise ValueError(f"Invalid priority. Must be one of {allowed}")
+        return v
+
+class TicketCreate(TicketBase):
+    pass
+
+class TicketUpdate(BaseModel):
+    subject: Optional[str] = None
+    description: Optional[str] = None
+    status: Optional[str] = None
+    priority: Optional[str] = None
+
+    @field_validator('status')
+    def validate_status(cls, v):
+        allowed = ['open', 'pending', 'resolved']
+        if v and v not in allowed:
+            raise ValueError(f"Invalid status. Must be one of {allowed}")
+        return v
+
+    @field_validator('priority')
+    def validate_priority(cls, v):
+        allowed = ['low', 'medium', 'high', 'urgent']
+        if v and v not in allowed:
+            raise ValueError(f"Invalid priority. Must be one of {allowed}")
+        return v
+
+class TicketResponse(TicketBase):
+    id: UUID
+    customer_name: Optional[str] = None
+    customer_email: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
