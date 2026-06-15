@@ -8,7 +8,8 @@ import {
   Filter, 
   MapPin, 
   ShoppingBag,
-  Upload
+  Upload,
+  Download
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -136,6 +137,63 @@ export default function CustomersPage() {
     }
   };
 
+  const handleExportCustomers = () => {
+    if (customers.length === 0) {
+      alert("No customers available to export.");
+      return;
+    }
+
+    const headers = [
+      "ID",
+      "Name",
+      "Email",
+      "Phone",
+      "City",
+      "Age",
+      "Gender",
+      "Tags",
+      "Total Orders",
+      "Total Spent (INR)",
+      "Last Purchase Date",
+      "Dormancy Status",
+      "RFM Segment",
+      "Churn Risk (%)"
+    ];
+
+    const rows = customers.map(c => [
+      c.id,
+      `"${c.name.replace(/"/g, '""')}"`,
+      c.email,
+      c.phone || "",
+      c.city || "",
+      c.age || "",
+      c.gender || "",
+      `"${(c.tags || []).join(", ").replace(/"/g, '""')}"`,
+      c.total_orders,
+      c.total_spent,
+      c.last_purchase_date || "",
+      c.dormancy_status || "",
+      c.rfm_segment || "",
+      (c.churn_risk * 100).toFixed(1)
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `maeven_customers_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+
   const getDormancyBadge = (status: string) => {
     switch (status.toLowerCase()) {
       case "active":
@@ -183,6 +241,13 @@ export default function CustomersPage() {
               disabled={importing}
             />
           </label>
+          <button
+            onClick={handleExportCustomers}
+            className="premium-button-secondary py-2 flex items-center gap-2"
+          >
+            <Download className="w-4 h-4 text-primary" />
+            <span>Export CSV</span>
+          </button>
           <button
             onClick={handleRecomputeRFM}
             disabled={recomputing}
