@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { Gem, Lock, Mail, RefreshCw, AlertCircle } from "lucide-react";
+import { Gem, RefreshCw, AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -108,7 +108,6 @@ export default function LoginPage() {
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-3.5 w-4 h-4 text-muted/60" />
                 <input
                   type="email"
                   required
@@ -116,7 +115,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
-                  className="premium-input pl-11 text-sm text-foreground placeholder:text-muted/40 w-full"
+                  className="premium-input px-4 text-sm text-foreground placeholder:text-muted/40 w-full"
                 />
               </div>
             </div>
@@ -129,7 +128,6 @@ export default function LoginPage() {
                 </label>
               </div>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-muted/60" />
                 <input
                   type="password"
                   required
@@ -137,7 +135,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}
-                  className="premium-input pl-11 text-sm text-foreground placeholder:text-muted/40 w-full"
+                  className="premium-input px-4 text-sm text-foreground placeholder:text-muted/40 w-full"
                 />
               </div>
             </div>
